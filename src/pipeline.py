@@ -37,15 +37,25 @@ class MLPipeline:
         self.y_test = None
         self.models = None
         
-    def load_and_preprocess_data(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+    def set_dataframe(self, df: pd.DataFrame):
+        """외부에서 데이터프레임 설정"""
+        self.df = df
+        logger.info(f"외부 데이터프레임 설정됨 - 형태: {df.shape}")
+    
+    def load_and_preprocess_data(self, use_external_data: bool = False) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
         """데이터 로드 및 전처리"""
         logger.info("데이터 로드 및 전처리 시작...")
         
         # 데이터 로드
-        self.df = self.data_loader.load_data()
+        if use_external_data and self.df is not None:
+            logger.info("외부 데이터프레임 사용")
+            data = self.df
+        else:
+            logger.info("기본 데이터 소스에서 데이터 로드")
+            data = self.data_loader.load_data()
         
         # 전처리
-        X, y = self.preprocessor.preprocess_full_data(self.df)
+        X, y = self.preprocessor.preprocess_full_data(data)
         
         # 데이터 분할
         self.X_train, self.X_test, self.y_train, self.y_test = DataSplitter.split_data(X, y)
@@ -124,12 +134,12 @@ class MLPipeline:
                 name, eval_result['accuracy'], eval_result['auc']
             )
     
-    def run_full_pipeline(self) -> Dict[str, Any]:
+    def run_full_pipeline(self, use_external_data: bool = False) -> Dict[str, Any]:
         """전체 파이프라인 실행"""
         logger.info("전체 파이프라인 실행 시작...")
         
         # 1. 데이터 로드 및 전처리
-        self.load_and_preprocess_data()
+        self.load_and_preprocess_data(use_external_data=use_external_data)
         
         # 2. 모델 학습
         self.train_models()

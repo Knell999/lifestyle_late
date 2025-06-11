@@ -57,16 +57,16 @@ def train_models(df: pd.DataFrame, config: Dict[str, Any]):
     try:
         # Import required modules with proper path handling
         try:
-            from pipeline import MLPipeline
-            from config import TARGET_COLUMN
+            from src.pipeline import MLPipeline
+            from src.config import TARGET_COLUMN
         except ImportError:
             # Fallback to relative path
             import sys
             import os
             sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
             try:
-                from pipeline import MLPipeline
-                from config import TARGET_COLUMN
+                from src.pipeline import MLPipeline
+                from src.config import TARGET_COLUMN
             except ImportError as e:
                 st.error(f"❌ 필요한 모듈을 불러올 수 없습니다: {str(e)}")
                 st.error("src 디렉토리의 pipeline.py와 config.py 파일을 확인하세요.")
@@ -80,22 +80,21 @@ def train_models(df: pd.DataFrame, config: Dict[str, Any]):
         status_text.text("🔧 파이프라인 초기화 중...")
         progress_bar.progress(10)
         
-        pipeline = MLPipeline(
-            target_column=TARGET_COLUMN,
-            test_size=config['test_size'],
-            random_state=int(config['random_state']),
-            cv_folds=config['cv_folds']
-        )
+        pipeline = MLPipeline(experiment_name=f"kcb_grade_prediction_{config.get('data_mode', 'full')}")
         
         # Load and preprocess data
         status_text.text("📊 데이터 전처리 중...")
         progress_bar.progress(30)
         
-        results = pipeline.run_pipeline(
-            data=df,
-            mode=config['data_mode'].lower(),
-            models_to_train=config['models']
-        )
+        # Set the dataframe for the pipeline
+        pipeline.set_dataframe(df)
+        
+        # Run the pipeline
+        status_text.text("🔄 모델 훈련 중...")
+        progress_bar.progress(50)
+        
+        # Execute the full pipeline with external data
+        results = pipeline.run_full_pipeline(use_external_data=True)
         
         progress_bar.progress(100)
         status_text.text("✅ 모델 훈련 완료!")
@@ -184,14 +183,14 @@ def create_individual_prediction(pipeline):
     try:
         # Import config with proper path handling
         try:
-            from config import ONEHOT_FEATURES, LABEL_FEATURES, BINARY_FEATURES
+            from src.config import ONEHOT_FEATURES, LABEL_FEATURES, BINARY_FEATURES
         except ImportError:
             # Fallback to relative path
             import sys
             import os
             sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
             try:
-                from config import ONEHOT_FEATURES, LABEL_FEATURES, BINARY_FEATURES
+                from src.config import ONEHOT_FEATURES, LABEL_FEATURES, BINARY_FEATURES
             except ImportError:
                 # Use default feature lists if config is not available
                 ONEHOT_FEATURES = ['AGE', 'SEX', 'JB_TP']
