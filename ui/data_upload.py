@@ -39,9 +39,38 @@ def create_data_upload_section():
     
     elif use_default:
         try:
-            from config import DATA_PATH
-            df = pd.read_csv(DATA_PATH)
-            st.success(f"✅ 기본 데이터가 로드되었습니다! ({len(df):,}개 행, {len(df.columns)}개 열)")
+            # Import config with proper path handling
+            try:
+                from config import DATA_PATH
+            except ImportError:
+                # Fallback to relative path
+                import sys
+                import os
+                sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+                from config import DATA_PATH
+            
+            # Try different possible paths for the data file
+            possible_paths = [
+                DATA_PATH,
+                os.path.join('data', 'df_KCB_grade.csv'),
+                os.path.join('..', 'data', 'df_KCB_grade.csv'),
+                os.path.join(os.path.dirname(__file__), '..', 'data', 'df_KCB_grade.csv')
+            ]
+            
+            df = None
+            for path in possible_paths:
+                try:
+                    if os.path.exists(path):
+                        df = pd.read_csv(path)
+                        break
+                except:
+                    continue
+            
+            if df is not None:
+                st.success(f"✅ 기본 데이터가 로드되었습니다! ({len(df):,}개 행, {len(df.columns)}개 열)")
+            else:
+                st.error("❌ 기본 데이터 파일을 찾을 수 없습니다. 파일을 업로드해주세요.")
+                return None
         except Exception as e:
             st.error(f"❌ 기본 데이터 로드 오류: {str(e)}")
             return None
@@ -117,7 +146,20 @@ def create_data_upload_section():
             st.dataframe(dtype_info, use_container_width=True)
         
         # Target variable analysis if available
-        from config import TARGET_COLUMN
+        try:
+            # Import TARGET_COLUMN with proper path handling
+            try:
+                from config import TARGET_COLUMN
+            except ImportError:
+                # Fallback to relative path
+                import sys
+                import os
+                sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+                from config import TARGET_COLUMN
+        except ImportError:
+            # If config is not available, use default target column name
+            TARGET_COLUMN = "KCB_grade"
+        
         if TARGET_COLUMN in df.columns:
             st.markdown("### 🎯 타겟 변수 분석")
             target_dist = df[TARGET_COLUMN].value_counts().sort_index()

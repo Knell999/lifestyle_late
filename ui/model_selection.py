@@ -55,9 +55,22 @@ def create_model_training_section(config: Dict[str, Any]):
 def train_models(df: pd.DataFrame, config: Dict[str, Any]):
     """Train models with progress tracking"""
     try:
-        # Import required modules
-        from pipeline import MLPipeline
-        from config import TARGET_COLUMN
+        # Import required modules with proper path handling
+        try:
+            from pipeline import MLPipeline
+            from config import TARGET_COLUMN
+        except ImportError:
+            # Fallback to relative path
+            import sys
+            import os
+            sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+            try:
+                from pipeline import MLPipeline
+                from config import TARGET_COLUMN
+            except ImportError as e:
+                st.error(f"❌ 필요한 모듈을 불러올 수 없습니다: {str(e)}")
+                st.error("src 디렉토리의 pipeline.py와 config.py 파일을 확인하세요.")
+                return
         
         # Create progress bar
         progress_bar = st.progress(0)
@@ -96,6 +109,8 @@ def train_models(df: pd.DataFrame, config: Dict[str, Any]):
         
     except Exception as e:
         st.error(f"❌ 훈련 중 오류가 발생했습니다: {str(e)}")
+        st.error("상세 오류 정보:")
+        st.exception(e)
 
 def display_training_results(results: Dict[str, Any]):
     """Display training results"""
@@ -167,7 +182,21 @@ def create_individual_prediction(pipeline):
     
     # Get feature names from the pipeline
     try:
-        from config import ONEHOT_FEATURES, LABEL_FEATURES, BINARY_FEATURES
+        # Import config with proper path handling
+        try:
+            from config import ONEHOT_FEATURES, LABEL_FEATURES, BINARY_FEATURES
+        except ImportError:
+            # Fallback to relative path
+            import sys
+            import os
+            sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+            try:
+                from config import ONEHOT_FEATURES, LABEL_FEATURES, BINARY_FEATURES
+            except ImportError:
+                # Use default feature lists if config is not available
+                ONEHOT_FEATURES = ['AGE', 'SEX', 'JB_TP']
+                LABEL_FEATURES = ['LIF_STG']
+                BINARY_FEATURES = ['CAR_YN', 'VIP_CARD_YN', 'TRAVEL_OS']
         
         # Create input form
         with st.form("individual_prediction"):
@@ -210,6 +239,10 @@ def create_individual_prediction(pipeline):
                 
                 except Exception as e:
                     st.error(f"예측 중 오류가 발생했습니다: {str(e)}")
+    
+    except Exception as e:
+        st.error(f"개별 예측 인터페이스 로딩 중 오류: {str(e)}")
+        st.info("기본 입력 폼을 사용합니다.")
 
 def create_batch_prediction(pipeline):
     """Create batch prediction interface"""
