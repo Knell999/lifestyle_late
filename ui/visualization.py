@@ -145,10 +145,29 @@ def create_target_analysis(df: pd.DataFrame):
     """Create target variable analysis"""
     st.markdown("#### 🎯 타겟 변수 분석")
     
-    from config import TARGET_COLUMN
+    # Import TARGET_COLUMN with proper path handling
+    try:
+        try:
+            from config import TARGET_COLUMN
+        except ImportError:
+            # Fallback to relative path
+            import sys
+            import os
+            sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+            try:
+                from config import TARGET_COLUMN
+            except ImportError:
+                # Use default target column name
+                TARGET_COLUMN = "KCB_grade"
+    except Exception:
+        TARGET_COLUMN = "KCB_grade"
     
     if TARGET_COLUMN not in df.columns:
         st.error(f"타겟 변수 '{TARGET_COLUMN}'를 찾을 수 없습니다.")
+        # Try to find similar column names
+        possible_targets = [col for col in df.columns if 'grade' in col.lower() or 'target' in col.lower()]
+        if possible_targets:
+            st.info(f"가능한 타겟 변수: {', '.join(possible_targets)}")
         return
     
     # Target distribution
@@ -309,7 +328,22 @@ def create_feature_analysis(df: pd.DataFrame):
         st.plotly_chart(fig, use_container_width=True)
     
     elif analysis_type == "타겟과의 관계":
-        from config import TARGET_COLUMN
+        # Import TARGET_COLUMN with proper path handling
+        try:
+            try:
+                from config import TARGET_COLUMN
+            except ImportError:
+                # Fallback to relative path
+                import sys
+                import os
+                sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+                try:
+                    from config import TARGET_COLUMN
+                except ImportError:
+                    # Use default target column name
+                    TARGET_COLUMN = "KCB_grade"
+        except Exception:
+            TARGET_COLUMN = "KCB_grade"
         
         if TARGET_COLUMN not in df.columns:
             st.error(f"타겟 변수 '{TARGET_COLUMN}'를 찾을 수 없습니다.")
