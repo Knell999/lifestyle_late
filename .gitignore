@@ -8,3 +8,24 @@ wheels/
 
 # Virtual environments
 .venv
+
+# UV package manager
+uv.lock
+
+# OS-specific files
+.DS_Store
+.python-version
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Experiments and temporary files
+experiments/
+temp/
+*.tmp
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
