@@ -41,13 +41,13 @@ def create_data_upload_section():
         try:
             # Import config with proper path handling
             try:
-                from config import DATA_PATH
+                from src.config import DATA_PATH
             except ImportError:
                 # Fallback to relative path
                 import sys
                 import os
                 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-                from config import DATA_PATH
+                from src.config import DATA_PATH
             
             # Try different possible paths for the data file
             possible_paths = [
@@ -149,13 +149,13 @@ def create_data_upload_section():
         try:
             # Import TARGET_COLUMN with proper path handling
             try:
-                from config import TARGET_COLUMN
+                from src.config import TARGET_COLUMN
             except ImportError:
                 # Fallback to relative path
                 import sys
                 import os
                 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-                from config import TARGET_COLUMN
+                from src.config import TARGET_COLUMN
         except ImportError:
             # If config is not available, use default target column name
             TARGET_COLUMN = "KCB_grade"
