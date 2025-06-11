@@ -21,7 +21,6 @@ def create_sidebar() -> Dict[str, Any]:
         ["홈", "데이터 업로드", "모델 훈련", "예측", "시각화", "모델 비교"]
     )
     
-    st.sidebar.markdown("---")
     
     # Configuration options
     config = {}
