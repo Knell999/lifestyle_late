@@ -5,3 +5,6 @@ xgboost
 lightgbm
 matplotlib
 seaborn
+streamlit
+plotly
+altair
