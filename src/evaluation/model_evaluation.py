@@ -6,9 +6,9 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import (
     accuracy_score, classification_report, roc_auc_score, 
-    confusion_matrix, roc_curve, cross_val_score
+    confusion_matrix, roc_curve
 )
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, cross_val_score
 from typing import Dict, Any, Tuple, List
 import logging
 
