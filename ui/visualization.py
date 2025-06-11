@@ -148,14 +148,14 @@ def create_target_analysis(df: pd.DataFrame):
     # Import TARGET_COLUMN with proper path handling
     try:
         try:
-            from config import TARGET_COLUMN
+            from src.config import TARGET_COLUMN
         except ImportError:
             # Fallback to relative path
             import sys
             import os
             sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
             try:
-                from config import TARGET_COLUMN
+                from src.config import TARGET_COLUMN
             except ImportError:
                 # Use default target column name
                 TARGET_COLUMN = "KCB_grade"
@@ -331,14 +331,14 @@ def create_feature_analysis(df: pd.DataFrame):
         # Import TARGET_COLUMN with proper path handling
         try:
             try:
-                from config import TARGET_COLUMN
+                from src.config import TARGET_COLUMN
             except ImportError:
                 # Fallback to relative path
                 import sys
                 import os
                 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
                 try:
-                    from config import TARGET_COLUMN
+                    from src.config import TARGET_COLUMN
                 except ImportError:
                     # Use default target column name
                     TARGET_COLUMN = "KCB_grade"
