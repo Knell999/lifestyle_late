@@ -13,11 +13,6 @@ maxUploadSize = 500
 
 [browser]
 gatherUsageStats = false
-showErrorDetails = true
 
 [logger]
 level = "info"
-
-[client]
-caching = true
-showErrorDetails = true
