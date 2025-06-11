@@ -39,18 +39,33 @@ def save_results(results: Dict[str, Any], filepath: str) -> None:
     """결과 저장"""
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     
-    # numpy 배열을 리스트로 변환
-    def convert_numpy(obj):
-        if hasattr(obj, 'tolist'):
+    import pandas as pd
+    import numpy as np
+    
+    # numpy 배열, pandas DataFrame/Series를 JSON 직렬화 가능한 형태로 변환
+    def convert_to_serializable(obj):
+        if isinstance(obj, pd.DataFrame):
+            return obj.to_dict('records')  # DataFrame을 딕셔너리 리스트로 변환
+        elif isinstance(obj, pd.Series):
+            return obj.to_dict()  # Series를 딕셔너리로 변환
+        elif hasattr(obj, 'tolist'):  # numpy 배열
             return obj.tolist()
         elif isinstance(obj, dict):
-            return {k: convert_numpy(v) for k, v in obj.items()}
+            return {k: convert_to_serializable(v) for k, v in obj.items()}
         elif isinstance(obj, list):
-            return [convert_numpy(item) for item in obj]
+            return [convert_to_serializable(item) for item in obj]
+        elif isinstance(obj, tuple):
+            return [convert_to_serializable(item) for item in obj]
+        elif isinstance(obj, (np.int64, np.int32, np.int16, np.int8)):
+            return int(obj)
+        elif isinstance(obj, (np.float64, np.float32, np.float16)):
+            return float(obj)
+        elif isinstance(obj, np.bool_):
+            return bool(obj)
         else:
             return obj
     
-    results_serializable = convert_numpy(results)
+    results_serializable = convert_to_serializable(results)
     
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(results_serializable, f, ensure_ascii=False, indent=2)
