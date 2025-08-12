@@ -10,7 +10,7 @@ wheels/
 .venv
 
 # UV package manager
-uv.lock
+# uv.lock  # 주석 처리: 재현 가능한 빌드를 위해 포함
 
 # OS-specific files
 .DS_Store
@@ -23,6 +23,12 @@ uv.lock
 experiments/
 temp/
 *.tmp
+
+# Large data files (use Git LFS or provide download instructions)
+# data/*.csv  # 대용량 데이터는 별도 다운로드 링크 제공
+
+# Claude Code generated files
+.claude/
 
 # IDE
 .vscode/
